@@ -59,9 +59,10 @@ public class WeatherActivity extends AppCompatActivity
             String[] permissions = new String[]{
                     Manifest.permission.ACCESS_COARSE_LOCATION};
             ActivityCompat.requestPermissions(this, permissions, permissionReqCode);
+        }else {
+            Location userLocation = LocationServices.FusedLocationApi.getLastLocation(client);
+            presenter.getWeather(userLocation.getLatitude(), userLocation.getLongitude());
         }
-        Location userLocation = LocationServices.FusedLocationApi.getLastLocation(client);
-        presenter.getWeather(userLocation.getLatitude(), userLocation.getLongitude());
     }
 
     @Override
