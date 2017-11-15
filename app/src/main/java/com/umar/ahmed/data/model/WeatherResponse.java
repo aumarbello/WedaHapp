@@ -1,0 +1,68 @@
+package com.umar.ahmed.data.model;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
+/**
+ * Created by ahmed on 11/15/17.
+ */
+
+public class WeatherResponse {
+    @SerializedName("cod")
+    @Expose
+    private String cod;
+    @SerializedName("message")
+    @Expose
+    private Double message;
+    @SerializedName("cnt")
+    @Expose
+    private Integer cnt;
+    @SerializedName("list")
+    @Expose
+    private List<WeatherItem> list = null;
+    @SerializedName("city")
+    @Expose
+    private City city;
+
+    public String getCod() {
+        return cod;
+    }
+
+    public void setCod(String cod) {
+        this.cod = cod;
+    }
+
+    public Double getMessage() {
+        return message;
+    }
+
+    public void setMessage(Double message) {
+        this.message = message;
+    }
+
+    public Integer getCnt() {
+        return cnt;
+    }
+
+    public void setCnt(Integer cnt) {
+        this.cnt = cnt;
+    }
+
+    public List<WeatherItem> getList() {
+        return list;
+    }
+
+    public void setList(List<WeatherItem> list) {
+        this.list = list;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+}

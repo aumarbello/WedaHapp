@@ -19,6 +19,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.umar.ahmed.presenter.WeatherPresenter;
+import com.umar.ahmed.weatherapp.R;
 
 /**
  * Created by ahmed on 11/6/17.
@@ -36,6 +37,7 @@ public class WeatherActivity extends AppCompatActivity
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.weather_layout);
         presenter = new WeatherPresenter(this);
 
         if (client == null) {

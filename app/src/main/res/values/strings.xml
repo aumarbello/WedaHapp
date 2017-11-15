@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">WeatherApp</string>
+    <string name="dummy_city">Abuja</string>
+    <string name="weather_degree">%s °</string>
+    <string name="celcius">C</string>
+    <string name="weather_description">Light Showers</string>
+    <string name="daily">Daily</string>
 </resources>
