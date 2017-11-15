@@ -2,7 +2,7 @@ package com.umar.ahmed.presenter;
 
 import com.google.gson.Gson;
 import com.umar.ahmed.AppConstants;
-import com.umar.ahmed.data.WeatherService;
+import com.umar.ahmed.data.remote.WeatherService;
 import com.umar.ahmed.view.WeatherActivity;
 
 import java.util.concurrent.TimeUnit;
