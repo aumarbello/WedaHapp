@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by ahmed on 11/15/17.
  */
 
-class Coord {
+public class Coord {
     @SerializedName("lat")
     @Expose
     private Double lat;

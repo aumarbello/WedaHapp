@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by ahmed on 11/15/17.
  */
 
-class Clouds {
+public class Clouds {
     @SerializedName("all")
     @Expose
     private Integer all;

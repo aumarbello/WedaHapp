@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by ahmed on 11/15/17.
  */
 
-class Wind {
+public class Wind {
     @SerializedName("speed")
     @Expose
     private Double speed;
