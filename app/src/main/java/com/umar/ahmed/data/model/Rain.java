@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by ahmed on 11/15/17.
  */
 
-class Rain {
+public class Rain {
     @SerializedName("3h")
     @Expose
     private Double _3h;

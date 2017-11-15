@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by ahmed on 11/15/17.
  */
 
-class City {
+public class City {
     @SerializedName("id")
     @Expose
     private Integer id;

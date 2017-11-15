@@ -9,7 +9,7 @@ import java.util.List;
  * Created by ahmed on 11/15/17.
  */
 
-class WeatherItem {
+public class WeatherItem {
     @SerializedName("dt")
     @Expose
     private Integer dt;
