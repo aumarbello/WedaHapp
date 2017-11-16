@@ -9,8 +9,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -18,8 +21,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.umar.ahmed.data.model.WeatherDay;
 import com.umar.ahmed.presenter.WeatherPresenter;
 import com.umar.ahmed.weatherapp.R;
+
+import java.util.List;
+
+import butterknife.BindView;
 
 /**
  * Created by ahmed on 11/6/17.
@@ -33,6 +41,12 @@ public class WeatherActivity extends AppCompatActivity
     private GoogleApiClient client;
     private static final int permissionReqCode = 21;
     private boolean isFirst;
+
+    @BindView(R.id.loading_weather_details)
+    ProgressBar weather_loading;
+
+    @BindView(R.id.weather_view_pager)
+    ViewPager weather_pager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,12 +63,19 @@ public class WeatherActivity extends AppCompatActivity
         }
     }
 
-    public void gotWeather() {
+    public void gotWeather(List<WeatherDay> weatherDays) {
+        weather_loading.setVisibility(View.GONE);
 
+        WeatherPagerAdapter pagerAdapter = new WeatherPagerAdapter
+                (getSupportFragmentManager(), weatherDays);
+
+        weather_pager.setAdapter(pagerAdapter);
     }
 
     public void noWeather() {
+        weather_loading.setVisibility(View.GONE);
 
+        //TODO SHOW ERROR STRING;
     }
 
 //  location callbacks

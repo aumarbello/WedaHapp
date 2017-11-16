@@ -11,4 +11,6 @@
     <string name="humidity">Humidity</string>
     <string name="winds">Winds</string>
     <string name="weather_icon">Weather Icon</string>
+
+    <string name="empty_degree">%2.2d°</string>
 </resources>
