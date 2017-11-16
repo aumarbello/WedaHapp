@@ -11,10 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.umar.ahmed.data.model.Main;
-import com.umar.ahmed.data.model.Weather;
-import com.umar.ahmed.data.model.WeatherDay;
-import com.umar.ahmed.data.model.WeatherItem;
+import com.umar.ahmed.data.local.model.Main;
+import com.umar.ahmed.data.local.model.Weather;
+import com.umar.ahmed.data.local.model.WeatherDay;
+import com.umar.ahmed.data.local.model.WeatherItem;
 import com.umar.ahmed.weatherapp.R;
 
 import java.util.Calendar;

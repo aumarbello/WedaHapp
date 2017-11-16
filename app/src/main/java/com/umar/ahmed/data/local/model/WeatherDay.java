@@ -1,4 +1,4 @@
-package com.umar.ahmed.data.model;
+package com.umar.ahmed.data.local.model;
 
 import java.io.Serializable;
 import java.util.List;

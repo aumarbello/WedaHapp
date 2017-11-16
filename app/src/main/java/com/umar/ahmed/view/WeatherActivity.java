@@ -21,7 +21,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.umar.ahmed.data.model.WeatherDay;
+import com.umar.ahmed.data.local.model.WeatherDay;
 import com.umar.ahmed.presenter.WeatherPresenter;
 import com.umar.ahmed.weatherapp.R;
 

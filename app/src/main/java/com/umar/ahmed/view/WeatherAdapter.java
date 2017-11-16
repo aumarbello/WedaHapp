@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.umar.ahmed.data.model.Weather;
-import com.umar.ahmed.data.model.WeatherItem;
+import com.umar.ahmed.data.local.model.Weather;
+import com.umar.ahmed.data.local.model.WeatherItem;
 import com.umar.ahmed.weatherapp.R;
 
 import java.util.List;

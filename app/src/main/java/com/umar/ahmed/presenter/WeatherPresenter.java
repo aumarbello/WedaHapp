@@ -2,8 +2,8 @@ package com.umar.ahmed.presenter;
 
 import com.google.gson.Gson;
 import com.umar.ahmed.AppConstants;
-import com.umar.ahmed.data.model.WeatherDay;
-import com.umar.ahmed.data.model.WeatherItem;
+import com.umar.ahmed.data.local.model.WeatherDay;
+import com.umar.ahmed.data.local.model.WeatherItem;
 import com.umar.ahmed.data.remote.WeatherService;
 import com.umar.ahmed.view.WeatherActivity;
 

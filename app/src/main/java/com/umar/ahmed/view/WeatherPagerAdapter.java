@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.umar.ahmed.data.model.WeatherDay;
+import com.umar.ahmed.data.local.model.WeatherDay;
 
 import java.util.List;
 
