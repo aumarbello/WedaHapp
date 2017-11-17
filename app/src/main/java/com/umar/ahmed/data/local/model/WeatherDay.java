@@ -29,4 +29,8 @@ public class WeatherDay implements Serializable{
     public List<WeatherItem> getStatsList() {
         return daysStats;
     }
+
+    public void setDaysStats(List<WeatherItem> daysStats) {
+        this.daysStats = daysStats;
+    }
 }
