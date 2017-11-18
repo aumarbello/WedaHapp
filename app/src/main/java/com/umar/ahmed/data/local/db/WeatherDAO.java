@@ -1,6 +1,7 @@
 package com.umar.ahmed.data.local.db;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -22,8 +23,8 @@ public class WeatherDAO {
     private SQLiteDatabase database;
 
 
-    public WeatherDAO(DatabaseHelper helper) {
-        this.helper = helper;
+    public WeatherDAO(Context context) {
+        this.helper = new DatabaseHelper(context);
     }
 
     public void open(){

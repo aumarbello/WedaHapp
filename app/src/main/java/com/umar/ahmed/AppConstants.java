@@ -23,7 +23,7 @@ public final class AppConstants {
     public static final String dayString = "day";
 
     //itemTable columns
-    public static final String foreignKey = "foreign";
+    public static final String foreignKey = "weatherCity";
     public static final String timeText = "timeInText";
     public static final String timeLong = "timeInLong";
     public static final String icon  = "weatherIcon";
@@ -34,14 +34,14 @@ public final class AppConstants {
 
 
     //sqLite commands
-    public static final String createDayTable = "CREATE IF NOT EXISTS " + dayTable + "(" +
-            "_id INTEGER PRIMARY KEY AUTO_INCREMENT, " +
+    public static final String createDayTable = "CREATE TABLE IF NOT EXISTS " + dayTable + "(" +
+            " _id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             cityName + " TEXT, " +
             dayString + " TEXT" + ")";
 
 
-    public static final String createItemTable = "CREATE IF NOT EXISTS " + itemTable + "(" +
-            "_id INTEGER PRIMARY KEY AUTO_INCREMENT, " +
+    public static final String createItemTable = "CREATE TABLE IF NOT EXISTS " + itemTable + "(" +
+            " _id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             foreignKey + " TEXT, " +
             timeText + " TEXT, " +
             timeLong + " LONG, " +
