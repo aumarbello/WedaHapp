@@ -2,6 +2,7 @@ package com.umar.ahmed.view;
 
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -33,8 +34,9 @@ class WeatherAdapter  extends RecyclerView.Adapter<WeatherAdapter.WeatherHolder>
 
     @Override
     public WeatherHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View weatherView = View.inflate(fragment.getActivity(),
-                R.layout.weather_list_item, parent);
+        LayoutInflater inflater = LayoutInflater.from(fragment.getActivity());
+        View weatherView = inflater.inflate(R.layout.weather_list_item, parent,
+                false);
         return new WeatherHolder(weatherView);
     }
 

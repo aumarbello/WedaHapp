@@ -34,10 +34,6 @@ public class WeatherFragment extends Fragment {
     private String cityName;
     private String dayString;
 
-    public WeatherFragment(){
-
-    }
-
     @BindView(R.id.weather_city)
     TextView weatherCity;
 
@@ -66,6 +62,7 @@ public class WeatherFragment extends Fragment {
         Bundle args = new Bundle();
         args.putSerializable(WeatherExtra, day);
         fragment.setArguments(args);
+        Log.d("WF", "Received day " + day.getDayString());
         return fragment;
     }
 
@@ -74,8 +71,8 @@ public class WeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = View.inflate(getActivity(),
-                R.layout.weather_fragment, container);
+        View view = inflater.inflate(R.layout.weather_fragment, container, false);
+
         unbinder = ButterKnife.bind(this, view);
         WeatherDay weatherDay = (WeatherDay) getArguments()
                 .getSerializable(WeatherExtra);
@@ -83,6 +80,7 @@ public class WeatherFragment extends Fragment {
         if (weatherDay != null){
             cityName = weatherDay.getCityName();
             dayString = weatherDay.getDayString();
+
             WeatherAdapter adapter = new WeatherAdapter(weatherDay.getStatsList(),
                     this);
             dayWeatherList.setAdapter(adapter);
@@ -94,7 +92,7 @@ public class WeatherFragment extends Fragment {
 
             WeatherItem currentItem = getCurrentWeatherItem(weatherDay.getStatsList());
             updateFragmentViews(currentItem);
-
+            Log.d("WF", "WD is not null");
         }else
             Log.d("WeatherFragment", "WeatherDay is null");
         return view;

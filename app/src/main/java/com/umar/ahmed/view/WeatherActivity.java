@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -28,19 +29,22 @@ import com.umar.ahmed.weatherapp.R;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * Created by ahmed on 11/6/17.
  */
 @SuppressLint("MissingPermission")
 @SuppressWarnings("deprecation")
-public class WeatherActivity extends AppCompatActivity
+public class WeatherActivity extends FragmentActivity
         implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private WeatherPresenter presenter;
     private GoogleApiClient client;
     private static final int permissionReqCode = 21;
     private boolean isFirst;
+    private Unbinder unbinder;
 
     @BindView(R.id.loading_weather_details)
     ProgressBar weather_loading;
@@ -52,6 +56,9 @@ public class WeatherActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_layout);
+
+        unbinder = ButterKnife.bind(this);
+
         presenter = new WeatherPresenter(this);
 
         if (client == null) {
@@ -60,6 +67,7 @@ public class WeatherActivity extends AppCompatActivity
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
+
         }
     }
 
@@ -68,7 +76,6 @@ public class WeatherActivity extends AppCompatActivity
 
         WeatherPagerAdapter pagerAdapter = new WeatherPagerAdapter
                 (getSupportFragmentManager(), weatherDays);
-
         weather_pager.setAdapter(pagerAdapter);
     }
 
@@ -92,6 +99,13 @@ public class WeatherActivity extends AppCompatActivity
                     .FusedLocationApi.getLastLocation(client);
             retrieveLocation(userLocation);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unbinder.unbind();
     }
 
     @Override
@@ -154,7 +168,7 @@ public class WeatherActivity extends AppCompatActivity
         if (!isFirst){
             Log.d("WeatherActivity", "Received location longitude - " +
                     location.getLongitude() + " Latitude - " + location.getLatitude());
-            presenter.getWeather(location.getLatitude(), location.getLongitude());
+            presenter.getWeather(location.getLatitude(), location.getLongitude(), true);
         }
         isFirst = true;
     }

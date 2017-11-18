@@ -1,7 +1,10 @@
 package com.umar.ahmed.presenter;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.umar.ahmed.AppConstants;
+import com.umar.ahmed.data.local.db.WeatherDAO;
 import com.umar.ahmed.data.local.model.WeatherDay;
 import com.umar.ahmed.data.local.model.WeatherItem;
 import com.umar.ahmed.data.remote.WeatherService;
@@ -26,13 +29,27 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WeatherPresenter {
     private WeatherActivity activity;
+    private WeatherDAO weatherDAO;
 
     public WeatherPresenter(WeatherActivity activity){
         this.activity =  activity;
+        weatherDAO = new WeatherDAO(activity);
     }
 
-    public void getWeather(double lat, double lon){
-        provideService().getWeather(lat, lon, "imperial",
+    public void getWeather(double lat, double lon, boolean freshOut){
+        if (freshOut){
+            loadFreshWeather(lat, lon);
+        }else {
+            Log.d("WP", "Reading from database");
+            weatherDAO.open();
+            activity.gotWeather(weatherDAO.getAllWeatherDays());
+            weatherDAO.close();
+        }
+
+    }
+
+    private void loadFreshWeather(double lat, double lon) {
+        provideService().getWeather(lat, lon, "metric",
                 AppConstants.API_KEY).
                 observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -49,7 +66,8 @@ public class WeatherPresenter {
 
                     for (WeatherItem item : originalItemList) {
                         Calendar weatherCalender = Calendar.getInstance();
-                        weatherCalender.setTimeInMillis(item.getDt());
+                        String stringTime = item.getDt() + "000";
+                        weatherCalender.setTimeInMillis(Long.valueOf(stringTime));
 
                         int weatherDay =  weatherCalender.get(Calendar.DAY_OF_YEAR);
 
@@ -65,6 +83,12 @@ public class WeatherPresenter {
                             fourthDayList.add(item);
                         }
                     }
+
+                    Log.d("WeatherPresenter", "Size of current day list - " + currentDayList.size());
+                    Log.d("WeatherPresenter", "Size of first day list - " + firstDayList.size());
+                    Log.d("WeatherPresenter", "Size of second day list - " + secondDayList.size());
+                    Log.d("WeatherPresenter", "Size of third day list - " + thirdDayList.size());
+                    Log.d("WeatherPresenter", "Size of fourth day list - " + fourthDayList.size());
 
                     String cityName = weatherResponse.getCity().getName();
 
@@ -86,10 +110,14 @@ public class WeatherPresenter {
                     weatherDays.add(plusThree);
                     weatherDays.add(plusFour);
 
-
+//                    weatherDAO.open();
+//                    weatherDAO.saveAllWeatherDays(weatherDays);
+//                    weatherDAO.close();
                     activity.gotWeather(weatherDays);
-                }, throwable ->
-                        activity.noWeather());
+                }, throwable -> {
+                    Log.d("WP", "Error", throwable);
+                    activity.noWeather();
+                });
 
     }
 
