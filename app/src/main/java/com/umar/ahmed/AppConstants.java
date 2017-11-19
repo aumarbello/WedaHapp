@@ -50,4 +50,7 @@ public final class AppConstants {
             averageTemp + " DOUBLE, " +
             minTemp + " DOUBLE, " +
             maxTemp + " DOUBLE" + ")";
+
+    public static final String dropDayTable = "DROP TABLE " + dayTable;
+    public static final String dropItemTable = "DROP TABLE " + itemTable;
 }

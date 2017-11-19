@@ -110,9 +110,9 @@ public class WeatherPresenter {
                     weatherDays.add(plusThree);
                     weatherDays.add(plusFour);
 
-//                    weatherDAO.open();
-//                    weatherDAO.saveAllWeatherDays(weatherDays);
-//                    weatherDAO.close();
+                    weatherDAO.open();
+                    weatherDAO.saveAllWeatherDays(weatherDays);
+                    weatherDAO.close();
                     activity.gotWeather(weatherDays);
                 }, throwable -> {
                     Log.d("WP", "Error", throwable);

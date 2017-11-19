@@ -12,6 +12,7 @@ import com.umar.ahmed.data.local.model.WeatherItem;
 
 import java.util.List;
 
+import static android.content.ContentValues.TAG;
 import static com.umar.ahmed.AppConstants.*;
 
 /**
@@ -36,6 +37,7 @@ public class WeatherDAO {
     }
 
     public void saveAllWeatherDays(List<WeatherDay> weatherDayList){
+        recreateTables();
         for (WeatherDay day : weatherDayList) {
             saveWeatherDay(day);
         }
@@ -43,11 +45,14 @@ public class WeatherDAO {
 
     public List<WeatherDay> getAllWeatherDays(){
         Cursor weatherDays = query(dayTable, null, null);
+
         DayWrapper wrapper = new DayWrapper(weatherDays);
         List<WeatherDay> weatherDayList = wrapper.getWeatherDay();
 
+
         for (WeatherDay day : weatherDayList) {
-            day.setDaysStats(addWeatherItems(day));
+            List<WeatherItem> itemList = addWeatherItems(day);
+            day.setDaysStats(itemList);
         }
 
         return weatherDayList;
@@ -63,7 +68,6 @@ public class WeatherDAO {
     private void saveWeatherDay(WeatherDay day) {
         database.insert(dayTable, null,
                 getWeatherValues(day));
-
         for (WeatherItem item : day.getStatsList()) {
             database.insert(itemTable, null, getItemValues(item,
                     day.getDayString()));
@@ -95,5 +99,13 @@ public class WeatherDAO {
     private Cursor query(String tableName, String whereClause, String[] args){
         return database.query(tableName, null, whereClause, args, null,
                 null, null);
+    }
+
+    private void recreateTables() {
+        database.execSQL(dropDayTable);
+        database.execSQL(dropItemTable);
+
+        database.execSQL(createDayTable);
+        database.execSQL(createItemTable);
     }
 }

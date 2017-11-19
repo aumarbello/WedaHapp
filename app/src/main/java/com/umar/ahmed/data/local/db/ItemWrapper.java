@@ -53,6 +53,7 @@ class ItemWrapper extends CursorWrapper {
             weatherMain.setTempMin(currentMinTemp);
             weatherMain.setTempMax(currentMaxTemp);
             item.setMain(weatherMain);
+            cursor.moveToNext();
 
             itemList.add(item);
         }

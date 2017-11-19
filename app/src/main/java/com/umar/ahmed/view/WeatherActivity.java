@@ -11,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -168,8 +167,9 @@ public class WeatherActivity extends FragmentActivity
         if (!isFirst){
             Log.d("WeatherActivity", "Received location longitude - " +
                     location.getLongitude() + " Latitude - " + location.getLatitude());
-            presenter.getWeather(location.getLatitude(), location.getLongitude(), true);
+            presenter.getWeather(location.getLatitude(), location.getLongitude(), false);
         }
+        //TODO cancel location request
         isFirst = true;
     }
 }
