@@ -64,7 +64,9 @@ public class WeatherFragment extends Fragment {
         Bundle args = new Bundle();
         args.putSerializable(WeatherExtra, day);
         fragment.setArguments(args);
+
         Log.d("WF", "Received day " + day.getDayString());
+
         return fragment;
     }
 
@@ -73,7 +75,9 @@ public class WeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.weather_fragment, container, false);
+
+        View view = inflater.inflate(R.layout.weather_fragment, container,
+                false);
 
         unbinder = ButterKnife.bind(this, view);
         WeatherDay weatherDay = (WeatherDay) getArguments()
@@ -121,6 +125,7 @@ public class WeatherFragment extends Fragment {
         weatherDegree.setText(getString(R.string.empty_degree, weatherMain.getTemp()));
         //weatherDescription
         Weather firstWeather = item.getWeather().get(0);
+
         String[] weatherDescriptions = firstWeather.getDescription().split(" ");
 
         String finalWeatherString = "";

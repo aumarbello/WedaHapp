@@ -51,12 +51,10 @@ public class WeatherPresenter {
 
     private void loadFreshWeather(double lat, double lon) {
         provideService().getWeather(lat, lon, "metric",
-                AppConstants.API_KEY).
-                observeOn(AndroidSchedulers.mainThread())
+                AppConstants.API_KEY).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(weatherResponse -> {
                     List<WeatherItem> originalItemList = weatherResponse.getList();
-
                     List<WeatherItem> currentDayList = new ArrayList<>();
                     List<WeatherItem> firstDayList = new ArrayList<>();
                     List<WeatherItem> secondDayList = new ArrayList<>();
@@ -119,7 +117,6 @@ public class WeatherPresenter {
                     Log.d("WP", "Error", throwable);
                     activity.noWeather();
                 });
-
     }
 
     private String getDayString(int currentDay) {

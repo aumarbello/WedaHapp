@@ -57,6 +57,7 @@ public class WeatherActivity extends FragmentActivity
 
         unbinder = ButterKnife.bind(this);
         weather_loading.show();
+
         presenter = new WeatherPresenter(this);
 
         if (client == null) {
@@ -71,7 +72,6 @@ public class WeatherActivity extends FragmentActivity
 
     public void gotWeather(List<WeatherDay> weatherDays) {
         weather_loading.hide();
-//        weather_loading.setVisibility(View.GONE);
 
         WeatherPagerAdapter pagerAdapter = new WeatherPagerAdapter
                 (getSupportFragmentManager(), weatherDays);
@@ -80,9 +80,6 @@ public class WeatherActivity extends FragmentActivity
 
     public void noWeather() {
         weather_loading.hide();
-//        weather_loading.setVisibility(View.GONE);
-
-        //TODO SHOW ERROR STRING;
     }
 
 //  location callbacks
@@ -112,6 +109,7 @@ public class WeatherActivity extends FragmentActivity
     public void onConnectionSuspended(int i) {
         Log.d("TAG", "Connection suspended");
     }
+
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -169,8 +167,8 @@ public class WeatherActivity extends FragmentActivity
             Log.d("WeatherActivity", "Received location longitude - " +
                     location.getLongitude() + " Latitude - " + location.getLatitude());
             presenter.getWeather(location.getLatitude(), location.getLongitude(), false);
-        }
         //TODO cancel location request
+        }
         isFirst = true;
     }
 }
