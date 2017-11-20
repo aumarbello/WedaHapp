@@ -11,9 +11,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -46,7 +45,7 @@ public class WeatherActivity extends FragmentActivity
     private Unbinder unbinder;
 
     @BindView(R.id.loading_weather_details)
-    ProgressBar weather_loading;
+    ContentLoadingProgressBar weather_loading;
 
     @BindView(R.id.weather_view_pager)
     ViewPager weather_pager;
@@ -57,7 +56,7 @@ public class WeatherActivity extends FragmentActivity
         setContentView(R.layout.weather_layout);
 
         unbinder = ButterKnife.bind(this);
-
+        weather_loading.show();
         presenter = new WeatherPresenter(this);
 
         if (client == null) {
@@ -71,7 +70,8 @@ public class WeatherActivity extends FragmentActivity
     }
 
     public void gotWeather(List<WeatherDay> weatherDays) {
-        weather_loading.setVisibility(View.GONE);
+        weather_loading.hide();
+//        weather_loading.setVisibility(View.GONE);
 
         WeatherPagerAdapter pagerAdapter = new WeatherPagerAdapter
                 (getSupportFragmentManager(), weatherDays);
@@ -79,7 +79,8 @@ public class WeatherActivity extends FragmentActivity
     }
 
     public void noWeather() {
-        weather_loading.setVisibility(View.GONE);
+        weather_loading.hide();
+//        weather_loading.setVisibility(View.GONE);
 
         //TODO SHOW ERROR STRING;
     }

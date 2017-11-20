@@ -5,11 +5,13 @@
     android:layout_width="match_parent"
     android:id="@+id/weather_frame">
 
-    <ProgressBar
+    <android.support.v4.widget.ContentLoadingProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/loading_weather_details"
-        android:layout_gravity="center|top"/>
+        android:layout_gravity="center|top"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_marginTop="10dp"/>
 
     <android.support.v4.view.ViewPager
         android:layout_width="match_parent"

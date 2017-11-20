@@ -85,15 +85,20 @@ class WeatherAdapter  extends RecyclerView.Adapter<WeatherAdapter.WeatherHolder>
             //weather_icon
             Weather firstWeather = item.getWeather().get(0);
             String firstIcon = firstWeather.getIcon();
-            if (firstIcon.startsWith("02")) {
-                weatherIcon.setImageDrawable(weatherResources.getDrawable(R.drawable.partly_cloudy));
-            }else if (firstIcon.startsWith("03") ||  firstIcon.startsWith("04")){
-                weatherIcon.setImageDrawable(weatherResources.getDrawable(R.drawable.clouds));
-            }else if (firstIcon.startsWith("09") || firstIcon.startsWith("10")
-                    ||  firstIcon.startsWith("11")){
-                weatherIcon.setImageDrawable(weatherResources.getDrawable(R.drawable.rain));
-            }else {
-                weatherIcon.setImageDrawable(weatherResources.getDrawable(R.drawable.sunny));
+
+            switch (WeatherFragment.getWeatherInt(firstIcon)){
+                case 0:
+                    weatherIcon.setImageDrawable(weatherResources.getDrawable(R.drawable.partly_cloudy));
+                    break;
+                case 1:
+                    weatherIcon.setImageDrawable(weatherResources.getDrawable(R.drawable.clouds));
+                    break;
+                case 2:
+                    weatherIcon.setImageDrawable(weatherResources.getDrawable(R.drawable.rain));
+                    break;
+                case 3:
+                    weatherIcon.setImageDrawable(weatherResources.getDrawable(R.drawable.sunny));
+                    break;
             }
         }
 

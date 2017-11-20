@@ -3,6 +3,7 @@ package com.umar.ahmed.presenter;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.umar.ahmed.AppConstants;
 import com.umar.ahmed.data.local.db.WeatherDAO;
 import com.umar.ahmed.data.local.model.WeatherDay;
@@ -143,10 +144,12 @@ public class WeatherPresenter {
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .build();
 
+        Gson gson = new GsonBuilder().setLenient().create();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(AppConstants.ENDPOINT)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(new Gson()))
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(client)
                 .build();
 
