@@ -119,13 +119,13 @@ public class WeatherActivity extends FragmentActivity
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.d("TAG", "Connection suspended");
+        //TODO Show snackbar to user
     }
 
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d("TAG", "Connection failed");
+        //TODO Show snackbar to user
     }
 
     @Override
