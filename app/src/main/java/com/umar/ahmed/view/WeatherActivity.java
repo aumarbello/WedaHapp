@@ -20,11 +20,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.umar.ahmed.WeatherApp;
 import com.umar.ahmed.data.local.model.WeatherDay;
 import com.umar.ahmed.presenter.WeatherPresenter;
 import com.umar.ahmed.weatherapp.R;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,7 +41,6 @@ import butterknife.Unbinder;
 public class WeatherActivity extends FragmentActivity
         implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
-    private WeatherPresenter presenter;
     private GoogleApiClient client;
     private static final int permissionReqCode = 21;
     private boolean isFirst;
@@ -50,15 +52,18 @@ public class WeatherActivity extends FragmentActivity
     @BindView(R.id.weather_view_pager)
     ViewPager weather_pager;
 
+    @Inject
+    WeatherPresenter presenter;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_layout);
 
+        ((WeatherApp)getApplication()).getComponent().inject(this);
+
         unbinder = ButterKnife.bind(this);
         weather_loading.show();
-
-        presenter = new WeatherPresenter(this);
 
         if (client == null) {
             client = new GoogleApiClient.Builder(this)
@@ -166,7 +171,7 @@ public class WeatherActivity extends FragmentActivity
         if (!isFirst){
             Log.d("WeatherActivity", "Received location longitude - " +
                     location.getLongitude() + " Latitude - " + location.getLatitude());
-            presenter.getWeather(location.getLatitude(), location.getLongitude(), false);
+            presenter.getWeather(location.getLatitude(), location.getLongitude(), true);
         //TODO cancel location request
         }
         isFirst = true;

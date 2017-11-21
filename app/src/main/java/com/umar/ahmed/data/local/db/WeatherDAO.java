@@ -12,6 +12,8 @@ import com.umar.ahmed.data.local.model.WeatherItem;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import static android.content.ContentValues.TAG;
 import static com.umar.ahmed.AppConstants.*;
 
@@ -23,7 +25,7 @@ public class WeatherDAO {
     private DatabaseHelper helper;
     private SQLiteDatabase database;
 
-
+    @Inject
     public WeatherDAO(Context context) {
         this.helper = new DatabaseHelper(context);
     }

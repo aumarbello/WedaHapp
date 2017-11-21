@@ -2,8 +2,6 @@ package com.umar.ahmed.presenter;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.umar.ahmed.AppConstants;
 import com.umar.ahmed.data.local.db.WeatherDAO;
 import com.umar.ahmed.data.local.model.WeatherDay;
@@ -14,27 +12,29 @@ import com.umar.ahmed.view.WeatherActivity;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by ahmed on 11/6/17.
  */
 
 public class WeatherPresenter {
-    private WeatherActivity activity;
+    private WeatherService service;
     private WeatherDAO weatherDAO;
+    private WeatherActivity activity;
 
-    public WeatherPresenter(WeatherActivity activity){
-        this.activity =  activity;
-        weatherDAO = new WeatherDAO(activity);
+    @Inject
+    public WeatherPresenter(WeatherService service, WeatherDAO weatherDAO){
+        this.service =  service;
+        this.weatherDAO = weatherDAO;
+    }
+
+    public void attachView(WeatherActivity activity){
+        this.activity = activity;
     }
 
     public void getWeather(double lat, double lon, boolean freshOut){
@@ -50,7 +50,7 @@ public class WeatherPresenter {
     }
 
     private void loadFreshWeather(double lat, double lon) {
-        provideService().getWeather(lat, lon, "metric",
+        service.getWeather(lat, lon, "metric",
                 AppConstants.API_KEY).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(weatherResponse -> {
@@ -129,27 +129,5 @@ public class WeatherPresenter {
                         "Thursday", "Friday", "Saturday"};
 
         return dayString[dayOfWeek - 1];
-    }
-
-    private WeatherService provideService(){
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(interceptor)
-                .readTimeout(60, TimeUnit.SECONDS)
-                .connectTimeout(60, TimeUnit.SECONDS)
-                .build();
-
-        Gson gson = new GsonBuilder().setLenient().create();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(AppConstants.ENDPOINT)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .client(client)
-                .build();
-
-        return retrofit.create(WeatherService.class);
     }
 }

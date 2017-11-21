@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 
 import java.util.Calendar;
 
+import javax.inject.Inject;
+
 /**
  * Created by ahmed on 11/20/17.
  */
@@ -16,6 +18,7 @@ public class WeatherPreference {
 
     private SharedPreferences preferences;
 
+    @Inject
     public WeatherPreference(Context context){
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
