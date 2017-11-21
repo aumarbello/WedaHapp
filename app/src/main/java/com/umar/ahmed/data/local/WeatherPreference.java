@@ -27,8 +27,8 @@ public class WeatherPreference {
         preferences.edit().putInt(FIRST_DAY_DATE, dayDate).apply();
     }
 
-    public void setWeatherSaved(boolean isSaved){
-        preferences.edit().putBoolean(WEATHER_SAVED, isSaved).apply();
+    public void setWeatherSaved(){
+        preferences.edit().putBoolean(WEATHER_SAVED, true).apply();
     }
 
     public int getFirstDayDate(){
@@ -39,6 +39,4 @@ public class WeatherPreference {
     public boolean isWeatherSaved(){
         return preferences.getBoolean(WEATHER_SAVED, false);
     }
-
-
 }

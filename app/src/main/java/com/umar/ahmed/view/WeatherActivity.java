@@ -12,7 +12,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.ContentLoadingProgressBar;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -162,7 +161,6 @@ public class WeatherActivity extends FragmentActivity
 
     private void retrieveLocation(Location userLocation) throws SecurityException{
         if (userLocation == null){
-            Log.d("TAG", "Location is null creating request");
             request = LocationRequest.create()
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                     .setInterval(10 * 1000)
@@ -177,14 +175,11 @@ public class WeatherActivity extends FragmentActivity
     @Override
     public void onLocationChanged(Location location) {
         if (!isFirst){
-            Log.d("WeatherActivity", "Received location longitude - " +
-                    location.getLongitude() + " Latitude - " + location.getLatitude());
-
             int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 
             boolean fresh = currentDay == preference.getFirstDayDate() && preference.isWeatherSaved();
 
-            presenter.getWeather(location.getLatitude(), location.getLongitude(), fresh);
+            presenter.getWeather(location.getLatitude(), location.getLongitude(), !fresh);
 
             if (request != null){
                 LocationServices.FusedLocationApi.removeLocationUpdates(client, this);

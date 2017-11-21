@@ -64,7 +64,7 @@ public class WeatherPresenter {
 
                     weatherDAO.open();
                     weatherDAO.saveAllWeatherDays(weatherDays);
-                    preference.setWeatherSaved(true);
+                    preference.setWeatherSaved();
                     preference.setFirstDayDate(currentDay);
                     weatherDAO.close();
                     activity.gotWeather(weatherDays);
