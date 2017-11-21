@@ -1,4 +1,4 @@
-package com.umar.ahmed.data.model;
+package com.umar.ahmed.data.local.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

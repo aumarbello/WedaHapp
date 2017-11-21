@@ -9,11 +9,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -21,38 +19,58 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.umar.ahmed.data.model.WeatherDay;
+import com.umar.ahmed.WeatherApp;
+import com.umar.ahmed.data.local.WeatherPreference;
+import com.umar.ahmed.data.local.model.WeatherDay;
 import com.umar.ahmed.presenter.WeatherPresenter;
 import com.umar.ahmed.weatherapp.R;
 
+import java.util.Calendar;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * Created by ahmed on 11/6/17.
  */
 @SuppressLint("MissingPermission")
 @SuppressWarnings("deprecation")
-public class WeatherActivity extends AppCompatActivity
+public class WeatherActivity extends FragmentActivity
         implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener {
-    private WeatherPresenter presenter;
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
     private GoogleApiClient client;
     private static final int permissionReqCode = 21;
     private boolean isFirst;
+    private Unbinder unbinder;
+    private LocationRequest request;
 
     @BindView(R.id.loading_weather_details)
-    ProgressBar weather_loading;
+    ContentLoadingProgressBar weather_loading;
 
     @BindView(R.id.weather_view_pager)
     ViewPager weather_pager;
+
+    @Inject
+    WeatherPresenter presenter;
+
+    @Inject
+    WeatherPreference preference;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_layout);
-        presenter = new WeatherPresenter(this);
+
+        ((WeatherApp)getApplication()).getComponent().inject(this);
+        presenter.attachView(this);
+
+        unbinder = ButterKnife.bind(this);
+        weather_loading.show();
 
         if (client == null) {
             client = new GoogleApiClient.Builder(this)
@@ -60,22 +78,20 @@ public class WeatherActivity extends AppCompatActivity
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
+
         }
     }
 
     public void gotWeather(List<WeatherDay> weatherDays) {
-        weather_loading.setVisibility(View.GONE);
+        weather_loading.hide();
 
         WeatherPagerAdapter pagerAdapter = new WeatherPagerAdapter
                 (getSupportFragmentManager(), weatherDays);
-
         weather_pager.setAdapter(pagerAdapter);
     }
 
     public void noWeather() {
-        weather_loading.setVisibility(View.GONE);
-
-        //TODO SHOW ERROR STRING;
+        weather_loading.hide();
     }
 
 //  location callbacks
@@ -95,9 +111,17 @@ public class WeatherActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unbinder.unbind();
+    }
+
+    @Override
     public void onConnectionSuspended(int i) {
         Log.d("TAG", "Connection suspended");
     }
+
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -137,9 +161,8 @@ public class WeatherActivity extends AppCompatActivity
 
     private void retrieveLocation(Location userLocation) throws SecurityException{
         if (userLocation == null){
-            Log.d("TAG", "Location is null creating request");
-            LocationRequest request = LocationRequest.create();
-            request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+            request = LocationRequest.create()
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                     .setInterval(10 * 1000)
                     .setFastestInterval(1000);
             LocationServices.FusedLocationApi.requestLocationUpdates
@@ -152,9 +175,15 @@ public class WeatherActivity extends AppCompatActivity
     @Override
     public void onLocationChanged(Location location) {
         if (!isFirst){
-            Log.d("WeatherActivity", "Received location longitude - " +
-                    location.getLongitude() + " Latitude - " + location.getLatitude());
-            presenter.getWeather(location.getLatitude(), location.getLongitude());
+            int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+
+            boolean fresh = currentDay == preference.getFirstDayDate() && preference.isWeatherSaved();
+
+            presenter.getWeather(location.getLatitude(), location.getLongitude(), !fresh);
+
+            if (request != null){
+                LocationServices.FusedLocationApi.removeLocationUpdates(client, this);
+            }
         }
         isFirst = true;
     }

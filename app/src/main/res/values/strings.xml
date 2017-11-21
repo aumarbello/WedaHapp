@@ -12,5 +12,5 @@
     <string name="winds">Winds</string>
     <string name="weather_icon">Weather Icon</string>
 
-    <string name="empty_degree">%2.2d°</string>
+    <string name="empty_degree">%.2f°</string>
 </resources>

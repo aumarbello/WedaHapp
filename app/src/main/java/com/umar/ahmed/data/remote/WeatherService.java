@@ -1,9 +1,8 @@
 package com.umar.ahmed.data.remote;
 
-import com.umar.ahmed.data.model.WeatherResponse;
+import com.umar.ahmed.data.local.model.WeatherResponse;
 
 import io.reactivex.Single;
-import okhttp3.ResponseBody;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
