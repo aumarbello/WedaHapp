@@ -3,9 +3,11 @@ package com.umar.ahmed.presenter;
 import android.util.Log;
 
 import com.umar.ahmed.AppConstants;
+import com.umar.ahmed.data.local.WeatherPreference;
 import com.umar.ahmed.data.local.db.WeatherDAO;
 import com.umar.ahmed.data.local.model.WeatherDay;
 import com.umar.ahmed.data.local.model.WeatherItem;
+import com.umar.ahmed.data.local.model.WeatherResponse;
 import com.umar.ahmed.data.remote.WeatherService;
 import com.umar.ahmed.view.WeatherActivity;
 
@@ -26,11 +28,14 @@ public class WeatherPresenter {
     private WeatherService service;
     private WeatherDAO weatherDAO;
     private WeatherActivity activity;
+    private WeatherPreference preference;
 
     @Inject
-    public WeatherPresenter(WeatherService service, WeatherDAO weatherDAO){
+    WeatherPresenter(WeatherService service, WeatherDAO weatherDAO,
+                            WeatherPreference preference){
         this.service =  service;
         this.weatherDAO = weatherDAO;
+        this.preference = preference;
     }
 
     public void attachView(WeatherActivity activity){
@@ -53,69 +58,23 @@ public class WeatherPresenter {
         service.getWeather(lat, lon, "metric",
                 AppConstants.API_KEY).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(weatherResponse -> {
-                    List<WeatherItem> originalItemList = weatherResponse.getList();
-                    List<WeatherItem> currentDayList = new ArrayList<>();
-                    List<WeatherItem> firstDayList = new ArrayList<>();
-                    List<WeatherItem> secondDayList = new ArrayList<>();
-                    List<WeatherItem> thirdDayList = new ArrayList<>();
-                    List<WeatherItem> fourthDayList = new ArrayList<>();
-
+                .map(this::mapWeatherResponse)
+                .subscribe(weatherDays -> {
                     int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-
-                    for (WeatherItem item : originalItemList) {
-                        Calendar weatherCalender = Calendar.getInstance();
-                        String stringTime = item.getDt() + "000";
-                        weatherCalender.setTimeInMillis(Long.valueOf(stringTime));
-
-                        int weatherDay =  weatherCalender.get(Calendar.DAY_OF_YEAR);
-
-                        if (weatherDay == currentDay){
-                            currentDayList.add(item);
-                        }else if (weatherDay == currentDay + 1){
-                            firstDayList.add(item);
-                        }else if(weatherDay == currentDay + 2){
-                            secondDayList.add(item);
-                        }else if (weatherDay == currentDay + 3){
-                            thirdDayList.add(item);
-                        }else if (weatherDay == currentDay + 4){
-                            fourthDayList.add(item);
-                        }
-                    }
-
-                    Log.d("WeatherPresenter", "Size of current day list - " + currentDayList.size());
-                    Log.d("WeatherPresenter", "Size of first day list - " + firstDayList.size());
-                    Log.d("WeatherPresenter", "Size of second day list - " + secondDayList.size());
-                    Log.d("WeatherPresenter", "Size of third day list - " + thirdDayList.size());
-                    Log.d("WeatherPresenter", "Size of fourth day list - " + fourthDayList.size());
-
-                    String cityName = weatherResponse.getCity().getName();
-
-                    WeatherDay todayWeather = new WeatherDay(currentDayList,
-                            cityName, getDayString(currentDay));
-                    WeatherDay plusOne = new WeatherDay(firstDayList, cityName,
-                            getDayString(currentDay + 1));
-                    WeatherDay plusTwo = new WeatherDay(secondDayList, cityName,
-                            getDayString(currentDay + 2));
-                    WeatherDay plusThree = new WeatherDay(thirdDayList, cityName,
-                            getDayString(currentDay + 3));
-                    WeatherDay plusFour = new WeatherDay(fourthDayList, cityName,
-                            getDayString(currentDay + 4));
-
-                    List<WeatherDay> weatherDays = new ArrayList<>();
-                    weatherDays.add(todayWeather);
-                    weatherDays.add(plusOne);
-                    weatherDays.add(plusTwo);
-                    weatherDays.add(plusThree);
-                    weatherDays.add(plusFour);
 
                     weatherDAO.open();
                     weatherDAO.saveAllWeatherDays(weatherDays);
+                    preference.setWeatherSaved(true);
+                    preference.setFirstDayDate(currentDay);
                     weatherDAO.close();
                     activity.gotWeather(weatherDays);
                 }, throwable -> {
                     Log.d("WP", "Error", throwable);
-                    activity.noWeather();
+
+                    if (preference.isWeatherSaved()){
+                        activity.gotWeather(weatherDAO.getAllWeatherDays());
+                    }else
+                        activity.noWeather();
                 });
     }
 
@@ -129,5 +88,57 @@ public class WeatherPresenter {
                         "Thursday", "Friday", "Saturday"};
 
         return dayString[dayOfWeek - 1];
+    }
+
+    private List<WeatherDay> mapWeatherResponse(WeatherResponse weatherResponse) {
+        List<WeatherItem> originalItemList = weatherResponse.getList();
+        List<WeatherItem> currentDayList = new ArrayList<>();
+        List<WeatherItem> firstDayList = new ArrayList<>();
+        List<WeatherItem> secondDayList = new ArrayList<>();
+        List<WeatherItem> thirdDayList = new ArrayList<>();
+        List<WeatherItem> fourthDayList = new ArrayList<>();
+
+        int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+
+        for (WeatherItem item : originalItemList) {
+            Calendar weatherCalender = Calendar.getInstance();
+            String stringTime = item.getDt() + "000";
+            weatherCalender.setTimeInMillis(Long.valueOf(stringTime));
+
+            int weatherDay =  weatherCalender.get(Calendar.DAY_OF_YEAR);
+
+            if (weatherDay == currentDay){
+                currentDayList.add(item);
+            }else if (weatherDay == currentDay + 1){
+                firstDayList.add(item);
+            }else if(weatherDay == currentDay + 2){
+                secondDayList.add(item);
+            }else if (weatherDay == currentDay + 3){
+                thirdDayList.add(item);
+            }else if (weatherDay == currentDay + 4){
+                fourthDayList.add(item);
+            }
+        }
+
+        String cityName = weatherResponse.getCity().getName();
+
+        WeatherDay todayWeather = new WeatherDay(currentDayList,
+                cityName, getDayString(currentDay));
+        WeatherDay plusOne = new WeatherDay(firstDayList, cityName,
+                getDayString(currentDay + 1));
+        WeatherDay plusTwo = new WeatherDay(secondDayList, cityName,
+                getDayString(currentDay + 2));
+        WeatherDay plusThree = new WeatherDay(thirdDayList, cityName,
+                getDayString(currentDay + 3));
+        WeatherDay plusFour = new WeatherDay(fourthDayList, cityName,
+                getDayString(currentDay + 4));
+
+        List<WeatherDay> weatherDays = new ArrayList<>();
+        weatherDays.add(todayWeather);
+        weatherDays.add(plusOne);
+        weatherDays.add(plusTwo);
+        weatherDays.add(plusThree);
+        weatherDays.add(plusFour);
+        return weatherDays;
     }
 }

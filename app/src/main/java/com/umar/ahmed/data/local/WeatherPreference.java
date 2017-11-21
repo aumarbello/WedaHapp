@@ -19,7 +19,7 @@ public class WeatherPreference {
     private SharedPreferences preferences;
 
     @Inject
-    public WeatherPreference(Context context){
+    WeatherPreference(Context context){
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 

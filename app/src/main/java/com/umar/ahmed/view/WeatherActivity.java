@@ -21,10 +21,12 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.umar.ahmed.WeatherApp;
+import com.umar.ahmed.data.local.WeatherPreference;
 import com.umar.ahmed.data.local.model.WeatherDay;
 import com.umar.ahmed.presenter.WeatherPresenter;
 import com.umar.ahmed.weatherapp.R;
 
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -40,11 +42,13 @@ import butterknife.Unbinder;
 @SuppressWarnings("deprecation")
 public class WeatherActivity extends FragmentActivity
         implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
     private GoogleApiClient client;
     private static final int permissionReqCode = 21;
     private boolean isFirst;
     private Unbinder unbinder;
+    private LocationRequest request;
 
     @BindView(R.id.loading_weather_details)
     ContentLoadingProgressBar weather_loading;
@@ -55,12 +59,16 @@ public class WeatherActivity extends FragmentActivity
     @Inject
     WeatherPresenter presenter;
 
+    @Inject
+    WeatherPreference preference;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_layout);
 
         ((WeatherApp)getApplication()).getComponent().inject(this);
+        presenter.attachView(this);
 
         unbinder = ButterKnife.bind(this);
         weather_loading.show();
@@ -155,8 +163,8 @@ public class WeatherActivity extends FragmentActivity
     private void retrieveLocation(Location userLocation) throws SecurityException{
         if (userLocation == null){
             Log.d("TAG", "Location is null creating request");
-            LocationRequest request = LocationRequest.create();
-            request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+            request = LocationRequest.create()
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                     .setInterval(10 * 1000)
                     .setFastestInterval(1000);
             LocationServices.FusedLocationApi.requestLocationUpdates
@@ -171,8 +179,16 @@ public class WeatherActivity extends FragmentActivity
         if (!isFirst){
             Log.d("WeatherActivity", "Received location longitude - " +
                     location.getLongitude() + " Latitude - " + location.getLatitude());
-            presenter.getWeather(location.getLatitude(), location.getLongitude(), true);
-        //TODO cancel location request
+
+            int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+
+            boolean fresh = currentDay == preference.getFirstDayDate() && preference.isWeatherSaved();
+
+            presenter.getWeather(location.getLatitude(), location.getLongitude(), fresh);
+
+            if (request != null){
+                LocationServices.FusedLocationApi.removeLocationUpdates(client, this);
+            }
         }
         isFirst = true;
     }
