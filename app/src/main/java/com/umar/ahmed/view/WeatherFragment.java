@@ -156,7 +156,8 @@ public class WeatherFragment extends Fragment {
                         getResources().getDrawable(R.drawable.partly_cloudy_back));
                 break;
             case 1:
-                weatherBack.setBackground(getResources().getDrawable(R.drawable.cloud_back));
+                weatherBack.setBackground(
+                        getResources().getDrawable(R.drawable.partly_cloudy_back));
                 break;
             case 2:
                 weatherBack.setBackground(getResources().getDrawable(R.drawable.rain_back));

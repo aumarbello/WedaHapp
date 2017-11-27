@@ -8,11 +8,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.ContentLoadingProgressBar;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -111,21 +111,21 @@ public class WeatherActivity extends FragmentActivity
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        unbinder.unbind();
-    }
-
-    @Override
     public void onConnectionSuspended(int i) {
-        //TODO Show snackbar to user
+        showSnackMessage(getString(R.string.location_error));
     }
 
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        //TODO Show snackbar to user
+        showSnackMessage(getString(R.string.location_error));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unbinder.unbind();
     }
 
     @Override
@@ -153,8 +153,7 @@ public class WeatherActivity extends FragmentActivity
                             .FusedLocationApi.getLastLocation(client);
                     retrieveLocation(userLocation);
                 }else {
-                    Toast.makeText(this, "Unable to get current location",
-                            Toast.LENGTH_SHORT).show();
+                    showSnackMessage("Unable to get current location");
                 }
         }
     }
@@ -186,5 +185,9 @@ public class WeatherActivity extends FragmentActivity
             }
         }
         isFirst = true;
+    }
+
+    private void showSnackMessage(String message){
+        Snackbar.make(weather_pager, message, Snackbar.LENGTH_SHORT);
     }
 }
