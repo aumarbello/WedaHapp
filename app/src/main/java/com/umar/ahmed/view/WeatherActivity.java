@@ -12,7 +12,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.ContentLoadingProgressBar;
-import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -51,6 +50,7 @@ public class WeatherActivity extends FragmentActivity
     private LocationRequest request;
     private ContainerWeather containerWeather;
     private static final String TAG = "ContainerList";
+    private Location userLocation;
 
     @BindView(R.id.loading_weather_details)
     ContentLoadingProgressBar weather_loading;
@@ -66,7 +66,9 @@ public class WeatherActivity extends FragmentActivity
 
     private View.OnClickListener snackListener = view -> {
         weather_loading.show();
-        beginLocationRetrieval();
+        weather_loading.setVisibility(View.VISIBLE);
+        isFirst = false;
+        onLocationChanged(userLocation);
     };
 
     @Override
@@ -95,17 +97,12 @@ public class WeatherActivity extends FragmentActivity
             }
         }
 
-        beginLocationRetrieval();
-    }
-
-    private void beginLocationRetrieval() {
         if (client == null) {
             client = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
-
         }
     }
 
@@ -118,6 +115,7 @@ public class WeatherActivity extends FragmentActivity
 
     public void gotWeather(List<WeatherDay> weatherDays) {
         weather_loading.hide();
+        weather_loading.setVisibility(View.GONE);
 
         WeatherPagerAdapter pagerAdapter = new WeatherPagerAdapter
                 (getSupportFragmentManager(), weatherDays);
@@ -222,6 +220,7 @@ public class WeatherActivity extends FragmentActivity
 
     @Override
     public void onLocationChanged(Location location) {
+        userLocation = location;
         if (!isFirst){
             int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 
@@ -229,7 +228,6 @@ public class WeatherActivity extends FragmentActivity
                     && preference.isWeatherSaved());
 
             presenter.getWeather(location.getLatitude(), location.getLongitude(), loadNewWeather);
-            Log.d(TAG, "Value of loadFresh - " + loadNewWeather);
 
             if (request != null){
                 LocationServices.FusedLocationApi.removeLocationUpdates(client, this);
@@ -240,8 +238,9 @@ public class WeatherActivity extends FragmentActivity
 
     private void showSnackMessage(String message, boolean addAction){
         if (addAction){
-            Snackbar snack = Snackbar.make(weather_pager, message, Snackbar.LENGTH_SHORT);
+            Snackbar snack = Snackbar.make(weather_pager, message, Snackbar.LENGTH_INDEFINITE);
             snack.setAction("Try Again", snackListener);
+            snack.setActionTextColor(getResources().getColor(R.color.colorPrimary));
             snack.show();
         }else {
             Snackbar.make(weather_pager, message, Snackbar.LENGTH_SHORT).show();
