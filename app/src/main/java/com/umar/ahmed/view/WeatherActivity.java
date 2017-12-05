@@ -20,6 +20,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.umar.ahmed.WeatherApp;
 import com.umar.ahmed.data.local.WeatherPreference;
+import com.umar.ahmed.data.local.model.ContainerWeather;
 import com.umar.ahmed.data.local.model.WeatherDay;
 import com.umar.ahmed.presenter.WeatherPresenter;
 import com.umar.ahmed.weatherapp.R;
@@ -46,6 +47,8 @@ public class WeatherActivity extends FragmentActivity
     private boolean isFirst;
     private Unbinder unbinder;
     private LocationRequest request;
+    private ContainerWeather containerWeather;
+    private static final String TAG = "ContainerList";
 
     @BindView(R.id.loading_weather_details)
     ContentLoadingProgressBar weather_loading;
@@ -70,6 +73,21 @@ public class WeatherActivity extends FragmentActivity
         unbinder = ButterKnife.bind(this);
         weather_loading.show();
 
+        if (savedInstanceState != null){
+            containerWeather = (ContainerWeather) savedInstanceState
+                    .getSerializable(TAG);
+            if (containerWeather != null){
+                weather_loading.hide();
+
+                List<WeatherDay> dayList =containerWeather.getWeatherDays();
+                WeatherPagerAdapter pagerAdapter = new
+                        WeatherPagerAdapter(getSupportFragmentManager() ,
+                        dayList);
+                weather_pager.setAdapter(pagerAdapter);
+                return;
+            }
+        }
+
         if (client == null) {
             client = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -80,12 +98,21 @@ public class WeatherActivity extends FragmentActivity
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(TAG, containerWeather);
+
+    }
+
     public void gotWeather(List<WeatherDay> weatherDays) {
         weather_loading.hide();
 
         WeatherPagerAdapter pagerAdapter = new WeatherPagerAdapter
                 (getSupportFragmentManager(), weatherDays);
         weather_pager.setAdapter(pagerAdapter);
+
+        containerWeather = new ContainerWeather(weatherDays);
     }
 
     public void noWeather() {
@@ -123,7 +150,9 @@ public class WeatherActivity extends FragmentActivity
     protected void onDestroy() {
         super.onDestroy();
 
-        unbinder.unbind();
+        if (unbinder != null) {
+            unbinder.unbind();
+        }
     }
 
     @Override
