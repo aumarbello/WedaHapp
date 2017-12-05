@@ -12,7 +12,6 @@ import com.umar.ahmed.view.WeatherActivity;
  */
 
 public class SplashScreen extends AppCompatActivity {
-    // TODO: 11/6/17 define activity theme
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -20,5 +19,6 @@ public class SplashScreen extends AppCompatActivity {
 
         Intent intent = new Intent(this, WeatherActivity.class);
         startActivity(intent);
+        finish();
     }
 }
