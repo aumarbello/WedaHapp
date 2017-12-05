@@ -153,7 +153,7 @@ public class WeatherActivity extends FragmentActivity
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        showSnackMessage(getString(R.string.location_error), false);
+      showSnackMessage(getString(R.string.location_error), false);        
     }
 
     @Override
