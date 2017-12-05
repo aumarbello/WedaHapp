@@ -1,7 +1,6 @@
 package com.umar.ahmed.view;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -37,7 +36,6 @@ import butterknife.Unbinder;
 /**
  * Created by ahmed on 11/6/17.
  */
-@SuppressLint("MissingPermission")
 @SuppressWarnings("deprecation")
 public class WeatherActivity extends FragmentActivity
         implements GoogleApiClient.ConnectionCallbacks,
@@ -147,11 +145,14 @@ public class WeatherActivity extends FragmentActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode){
             case permissionReqCode:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    Location userLocation = LocationServices
-                            .FusedLocationApi.getLastLocation(client);
-                    retrieveLocation(userLocation);
+                if (grantResults.length > 0){
+                    if (ActivityCompat.checkSelfPermission(this,
+                            Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED){
+                        Location userLocation = LocationServices
+                                .FusedLocationApi.getLastLocation(client);
+                        retrieveLocation(userLocation);
+                    }
                 }else {
                     showSnackMessage("Unable to get current location");
                 }
