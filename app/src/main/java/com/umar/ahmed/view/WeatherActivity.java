@@ -12,6 +12,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.ContentLoadingProgressBar;
+import android.util.Log;
+import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -62,6 +64,11 @@ public class WeatherActivity extends FragmentActivity
     @Inject
     WeatherPreference preference;
 
+    private View.OnClickListener snackListener = view -> {
+        weather_loading.show();
+        beginLocationRetrieval();
+    };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +95,10 @@ public class WeatherActivity extends FragmentActivity
             }
         }
 
+        beginLocationRetrieval();
+    }
+
+    private void beginLocationRetrieval() {
         if (client == null) {
             client = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -117,6 +128,7 @@ public class WeatherActivity extends FragmentActivity
 
     public void noWeather() {
         weather_loading.hide();
+        showSnackMessage("Could not retrieve Weather Now.", true);
     }
 
 //  location callbacks
@@ -137,13 +149,13 @@ public class WeatherActivity extends FragmentActivity
 
     @Override
     public void onConnectionSuspended(int i) {
-        showSnackMessage(getString(R.string.location_error));
+        showSnackMessage(getString(R.string.location_error), false);
     }
 
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        showSnackMessage(getString(R.string.location_error));
+        showSnackMessage(getString(R.string.location_error), false);
     }
 
     @Override
@@ -183,7 +195,8 @@ public class WeatherActivity extends FragmentActivity
                         retrieveLocation(userLocation);
                     }
                 }else {
-                    showSnackMessage("Unable to get current location");
+                    showSnackMessage("Location permission denied, " +
+                            "Kindly enable permission and try again", false);
                 }
         }
     }
@@ -206,9 +219,11 @@ public class WeatherActivity extends FragmentActivity
         if (!isFirst){
             int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 
-            boolean fresh = currentDay == preference.getFirstDayDate() && preference.isWeatherSaved();
+            boolean loadNewWeather = !(currentDay == preference.getFirstDayDate()
+                    && preference.isWeatherSaved());
 
-            presenter.getWeather(location.getLatitude(), location.getLongitude(), !fresh);
+            presenter.getWeather(location.getLatitude(), location.getLongitude(), loadNewWeather);
+            Log.d(TAG, "Value of loadFresh - " + loadNewWeather);
 
             if (request != null){
                 LocationServices.FusedLocationApi.removeLocationUpdates(client, this);
@@ -217,7 +232,13 @@ public class WeatherActivity extends FragmentActivity
         isFirst = true;
     }
 
-    private void showSnackMessage(String message){
-        Snackbar.make(weather_pager, message, Snackbar.LENGTH_SHORT);
+    private void showSnackMessage(String message, boolean addAction){
+        if (addAction){
+            Snackbar snack = Snackbar.make(weather_pager, message, Snackbar.LENGTH_SHORT);
+            snack.setAction("Try Again", snackListener);
+            snack.show();
+        }else {
+            Snackbar.make(weather_pager, message, Snackbar.LENGTH_SHORT).show();
+        }
     }
 }

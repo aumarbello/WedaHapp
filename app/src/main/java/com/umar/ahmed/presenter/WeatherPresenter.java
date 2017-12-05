@@ -42,8 +42,8 @@ public class WeatherPresenter {
         this.activity = activity;
     }
 
-    public void getWeather(double lat, double lon, boolean freshOut){
-        if (freshOut){
+    public void getWeather(double lat, double lon, boolean loadNewWeather){
+        if (loadNewWeather){
             loadFreshWeather(lat, lon);
         }else {
             Log.d("WP", "Reading from database");
@@ -64,9 +64,9 @@ public class WeatherPresenter {
 
                     weatherDAO.open();
                     weatherDAO.saveAllWeatherDays(weatherDays);
+                    weatherDAO.close();
                     preference.setWeatherSaved();
                     preference.setFirstDayDate(currentDay);
-                    weatherDAO.close();
                     activity.gotWeather(weatherDays);
                 }, throwable -> {
                     Log.d("WP", "Error", throwable);
