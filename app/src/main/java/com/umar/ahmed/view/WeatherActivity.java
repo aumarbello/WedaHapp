@@ -169,13 +169,19 @@ public class WeatherActivity extends FragmentActivity
 
     @Override
     protected void onStart() {
-        client.connect();
+        if (client != null){
+            client.connect();
+        }
+
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        client.disconnect();
+        if (client != null){
+            client.disconnect();
+        }
+
         super.onStop();
     }
 
