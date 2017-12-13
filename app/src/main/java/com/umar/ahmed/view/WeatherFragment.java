@@ -1,5 +1,6 @@
 package com.umar.ahmed.view;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v17.leanback.widget.HorizontalGridView;
@@ -29,10 +30,16 @@ import butterknife.Unbinder;
  */
 
 public class WeatherFragment extends Fragment {
+
+    interface WeatherBack{
+        void loadNewWeather();
+    }
+
     private static final String WeatherExtra = "Day_Extra";
     private Unbinder unbinder;
     private String cityName;
     private String dayString;
+    private WeatherBack callback;
 
     @BindView(R.id.weather_city)
     TextView weatherCity;
@@ -95,7 +102,20 @@ public class WeatherFragment extends Fragment {
             updateFragmentViews(currentItem);
         }
 
+        weatherCity.setOnClickListener(v -> callback.loadNewWeather());
+
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (context instanceof WeatherBack){
+            callback = (WeatherBack) context;
+        }else
+            throw new RuntimeException("Containing Activity Must " +
+                    "Implement CallBack interface");
     }
 
     public static int getWeatherInt(String icon){
