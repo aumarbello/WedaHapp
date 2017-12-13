@@ -15,6 +15,7 @@ import javax.inject.Inject;
 public class WeatherPreference {
     private static final String FIRST_DAY_DATE = "day_of_year";
     private static final String WEATHER_SAVED = "isWeatherSaved";
+    private static final String CURRENT_CITY = "savedCity";
 
     private SharedPreferences preferences;
 
@@ -27,8 +28,8 @@ public class WeatherPreference {
         preferences.edit().putInt(FIRST_DAY_DATE, dayDate).apply();
     }
 
-    public void setWeatherSaved(){
-        preferences.edit().putBoolean(WEATHER_SAVED, true).apply();
+    public void setWeatherSaved(boolean isWeatherSaved){
+        preferences.edit().putBoolean(WEATHER_SAVED, isWeatherSaved).apply();
     }
 
     public int getFirstDayDate(){
@@ -38,5 +39,16 @@ public class WeatherPreference {
 
     public boolean isWeatherSaved(){
         return preferences.getBoolean(WEATHER_SAVED, false);
+    }
+
+    public String getCurrentCity() {
+        return preferences.getString(CURRENT_CITY, "Lagos");
+    }
+
+    public void setCurrentCity(String city){
+        preferences
+                .edit()
+                .putString(CURRENT_CITY, city)
+                .apply();
     }
 }

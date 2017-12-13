@@ -13,7 +13,8 @@
     <string name="weather_icon">Weather Icon</string>
 
     <string name="empty_degree">%.2f°</string>
-    <string name="location_error">Unable to retrieve location please try again</string>
-    <string name="location_perm_denied">Location permission denied, Kindly enable permission and try again</string>
     <string name="weather_loading_error_msg">Could not retrieve Weather Now.</string>
+    <string name="invalid_city">Could not load weather for city entered, Please try a different city.</string>
+    <string name="city_hint">Enter City</string>
+    <string name="loading_new">Loading new weather, Please wait</string>
 </resources>

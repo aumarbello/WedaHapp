@@ -19,6 +19,7 @@ import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.HttpException;
 
 /**
  * Created by ahmed on 11/6/17.
@@ -42,9 +43,9 @@ public class WeatherPresenter {
         this.activity = activity;
     }
 
-    public void getWeather(double lat, double lon, boolean loadNewWeather){
+    public void getWeather(boolean loadNewWeather, String city){
         if (loadNewWeather){
-            loadFreshWeather(lat, lon);
+            loadFreshWeather(city);
         }else {
             Log.d("WP", "Reading from database");
             weatherDAO.open();
@@ -54,9 +55,10 @@ public class WeatherPresenter {
 
     }
 
-    private void loadFreshWeather(double lat, double lon) {
-        service.getWeather(lat, lon, "metric",
-                AppConstants.API_KEY).observeOn(AndroidSchedulers.mainThread())
+    private void loadFreshWeather(String city) {
+        service.getWeather(AppConstants.WEATHER_UNIT,
+                AppConstants.API_KEY, city)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .map(this::mapWeatherResponse)
                 .subscribe(weatherDays -> {
@@ -65,10 +67,19 @@ public class WeatherPresenter {
                     weatherDAO.open();
                     weatherDAO.saveAllWeatherDays(weatherDays);
                     weatherDAO.close();
-                    preference.setWeatherSaved();
+
+                    preference.setCurrentCity(city);
+                    preference.setWeatherSaved(true);
                     preference.setFirstDayDate(currentDay);
                     activity.gotWeather(weatherDays);
                 }, throwable -> {
+                    if(throwable instanceof HttpException){
+                        HttpException exception = (HttpException) throwable;
+                        if (exception.code() == 404){
+                            activity.cityNotFound();
+                            return;
+                        }
+                    }
                     Log.d("WP", "Error", throwable);
 
                     if (preference.isWeatherSaved()){

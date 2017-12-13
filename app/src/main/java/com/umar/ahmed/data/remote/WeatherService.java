@@ -11,9 +11,8 @@ import retrofit2.http.Query;
  */
 
 public interface WeatherService {
-    @GET("forecast")
-    Single<WeatherResponse> getWeather(@Query("lat") double latitude,
-                                       @Query("lon") double lon,
-                                       @Query("units") String units,
-                                       @Query("APPID") String appId);
+    @GET("forecast?")
+    Single<WeatherResponse> getWeather(@Query("units") String units,
+                                       @Query("APPID") String appId,
+                                       @Query("q") String city);
 }

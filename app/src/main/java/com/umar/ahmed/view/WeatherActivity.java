@@ -1,25 +1,16 @@
 package com.umar.ahmed.view;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.os.Build;
+import android.app.AlertDialog;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
+import android.widget.EditText;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.umar.ahmed.WeatherApp;
 import com.umar.ahmed.data.local.WeatherPreference;
 import com.umar.ahmed.data.local.model.ContainerWeather;
@@ -39,19 +30,13 @@ import butterknife.Unbinder;
 /**
  * Created by ahmed on 11/6/17.
  */
-@SuppressWarnings("deprecation")
 public class WeatherActivity extends FragmentActivity
-        implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
-    private GoogleApiClient client;
-    private static final int permissionReqCode = 21;
-    private boolean isFirst;
+        implements WeatherFragment.WeatherBack{
+
     private Unbinder unbinder;
-    private LocationRequest request;
     private ContainerWeather containerWeather;
     private static final String TAG = "ContainerList";
-    private Location userLocation;
+    private WeatherPagerAdapter adapter;
 
     @BindView(R.id.loading_weather_details)
     ContentLoadingProgressBar weather_loading;
@@ -71,14 +56,12 @@ public class WeatherActivity extends FragmentActivity
     private View.OnClickListener snackListener = view -> {
         weather_loading.show();
         weather_loading.setVisibility(View.VISIBLE);
-        isFirst = false;
-        onLocationChanged(userLocation);
+        getCityAndLoadWeather();
     };
 
     private SwipeRefreshLayout.OnRefreshListener refreshListener = () -> {
-        isFirst = false;
         preference.setWeatherSaved(false);
-        checkPermOrGetLocation();
+        getCityAndLoadWeather();
     };
 
     @Override
@@ -104,17 +87,9 @@ public class WeatherActivity extends FragmentActivity
                         WeatherPagerAdapter(getSupportFragmentManager() ,
                         dayList);
                 weather_pager.setAdapter(pagerAdapter);
-                return;
             }
-        }
-
-        if (client == null) {
-            client = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
+        }else
+            getCityAndLoadWeather();
     }
 
     @Override
@@ -129,9 +104,18 @@ public class WeatherActivity extends FragmentActivity
         weather_loading.hide();
         weather_loading.setVisibility(View.GONE);
 
-        WeatherPagerAdapter pagerAdapter = new WeatherPagerAdapter
-                (getSupportFragmentManager(), weatherDays);
-        weather_pager.setAdapter(pagerAdapter);
+
+        if (adapter == null){
+            adapter = new WeatherPagerAdapter
+                    (getSupportFragmentManager(), weatherDays);
+        }else{
+            ((WeatherPagerAdapter)weather_pager.getAdapter()).setListItems(weatherDays);
+            weather_pager.getAdapter().notifyDataSetChanged();
+        }
+
+//        if (weather_pager.getAdapter() == null){
+            weather_pager.setAdapter(adapter);
+//        }
 
         containerWeather = new ContainerWeather(weatherDays);
     }
@@ -141,36 +125,15 @@ public class WeatherActivity extends FragmentActivity
         showSnackMessage(getString(R.string.weather_loading_error_msg), true);
     }
 
-//  location callbacks
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        checkPermOrGetLocation();
+    public void cityNotFound(){
+        refreshWeather.setRefreshing(false);
+        showSnackMessage(getString(R.string.invalid_city), false);
     }
 
+    private void getCityAndLoadWeather() {
+        String city = preference.getCurrentCity();
 
-    @Override
-    public void onConnectionSuspended(int i) {
-        showSnackMessage(getString(R.string.location_error), false);
-    }
-
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        showSnackMessage(getString(R.string.location_error), false);
-    }
-
-    private void checkPermOrGetLocation() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-            String[] permissions = new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION};
-            ActivityCompat.requestPermissions(this, permissions, permissionReqCode);
-        }else {
-            Location userLocation = LocationServices
-                    .FusedLocationApi.getLastLocation(client);
-            retrieveLocation(userLocation);
-        }
+        presenter.getWeather(shouldLoadNewWeather(), city);
     }
 
     @Override
@@ -180,72 +143,6 @@ public class WeatherActivity extends FragmentActivity
         if (unbinder != null) {
             unbinder.unbind();
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (client != null){
-            client.connect();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        if (client != null){
-            client.disconnect();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case permissionReqCode:
-                if (grantResults.length > 0){
-                    if (ActivityCompat.checkSelfPermission(this,
-                            Manifest.permission.ACCESS_FINE_LOCATION)
-                            == PackageManager.PERMISSION_GRANTED){
-                        Location userLocation = LocationServices
-                                .FusedLocationApi.getLastLocation(client);
-                        retrieveLocation(userLocation);
-                    }
-                }else {
-                    showSnackMessage(getString(R.string.location_perm_denied), false);
-                }
-        }
-    }
-
-    private void retrieveLocation(Location userLocation) throws SecurityException{
-        if (userLocation == null){
-            request = LocationRequest.create()
-                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                    .setInterval(10 * 1000)
-                    .setFastestInterval(1000);
-            LocationServices.FusedLocationApi.requestLocationUpdates
-                    (client, request , this);
-        }else {
-            onLocationChanged(userLocation);
-        }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        userLocation = location;
-        if (!isFirst){
-            boolean loadNewWeather = shouldLoadNewWeather();
-            presenter.getWeather(location.getLatitude(), location.getLongitude(), loadNewWeather);
-
-            if (request != null){
-                LocationServices.FusedLocationApi.removeLocationUpdates(client, this);
-            }
-        }
-        isFirst = true;
     }
 
     private boolean shouldLoadNewWeather() {
@@ -263,5 +160,23 @@ public class WeatherActivity extends FragmentActivity
         }else {
             Snackbar.make(weather_pager, message, Snackbar.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void loadNewWeather() {
+        View editView = View.inflate(this, R.layout.dialog_view, null);
+
+        EditText city = editView.findViewById(R.id.enter_city);
+
+        AlertDialog cityDialog = new AlertDialog.Builder(this)
+                .setTitle("Enter Valid City")
+                .setView(editView)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    showSnackMessage(getString(R.string.loading_new), false);
+                    presenter.getWeather(true, city.getText().toString().trim());
+                })
+                .create();
+
+        cityDialog.show();
     }
 }
