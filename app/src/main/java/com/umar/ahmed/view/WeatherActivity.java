@@ -113,9 +113,7 @@ public class WeatherActivity extends FragmentActivity
             weather_pager.getAdapter().notifyDataSetChanged();
         }
 
-//        if (weather_pager.getAdapter() == null){
-            weather_pager.setAdapter(adapter);
-//        }
+        weather_pager.setAdapter(adapter);
 
         containerWeather = new ContainerWeather(weatherDays);
     }
@@ -142,6 +140,10 @@ public class WeatherActivity extends FragmentActivity
 
         if (unbinder != null) {
             unbinder.unbind();
+        }
+
+        if (presenter != null){
+            presenter.closeOnDestroy();
         }
     }
 

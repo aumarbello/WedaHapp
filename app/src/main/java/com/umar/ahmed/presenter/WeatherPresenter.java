@@ -1,7 +1,5 @@
 package com.umar.ahmed.presenter;
 
-import android.util.Log;
-
 import com.umar.ahmed.AppConstants;
 import com.umar.ahmed.data.local.WeatherPreference;
 import com.umar.ahmed.data.local.db.WeatherDAO;
@@ -40,6 +38,7 @@ public class WeatherPresenter {
     }
 
     public void attachView(WeatherActivity activity){
+        weatherDAO.open();
         this.activity = activity;
     }
 
@@ -47,10 +46,7 @@ public class WeatherPresenter {
         if (loadNewWeather){
             loadFreshWeather(city);
         }else {
-            Log.d("WP", "Reading from database");
-            weatherDAO.open();
             activity.gotWeather(weatherDAO.getAllWeatherDays());
-            weatherDAO.close();
         }
 
     }
@@ -64,9 +60,7 @@ public class WeatherPresenter {
                 .subscribe(weatherDays -> {
                     int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 
-                    weatherDAO.open();
                     weatherDAO.saveAllWeatherDays(weatherDays);
-                    weatherDAO.close();
 
                     preference.setCurrentCity(city);
                     preference.setWeatherSaved(true);
@@ -80,7 +74,6 @@ public class WeatherPresenter {
                             return;
                         }
                     }
-                    Log.d("WP", "Error", throwable);
 
                     if (preference.isWeatherSaved()){
                         activity.gotWeather(weatherDAO.getAllWeatherDays());
@@ -151,5 +144,9 @@ public class WeatherPresenter {
         weatherDays.add(plusThree);
         weatherDays.add(plusFour);
         return weatherDays;
+    }
+
+    public void closeOnDestroy(){
+        weatherDAO.close();
     }
 }
