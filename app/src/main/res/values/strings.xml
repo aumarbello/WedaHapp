@@ -14,4 +14,6 @@
 
     <string name="empty_degree">%.2f°</string>
     <string name="location_error">Unable to retrieve location please try again</string>
+    <string name="location_perm_denied">Location permission denied, Kindly enable permission and try again</string>
+    <string name="weather_loading_error_msg">Could not retrieve Weather Now.</string>
 </resources>
