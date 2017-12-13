@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v17.leanback.widget.HorizontalGridView;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,8 +64,6 @@ public class WeatherFragment extends Fragment {
         args.putSerializable(WeatherExtra, day);
         fragment.setArguments(args);
 
-        Log.d("WF", "Received day " + day.getDayString());
-
         return fragment;
     }
 
@@ -96,9 +93,8 @@ public class WeatherFragment extends Fragment {
 
             WeatherItem currentItem = getCurrentWeatherItem(weatherDay.getStatsList());
             updateFragmentViews(currentItem);
-            Log.d("WF", "WD is not null");
-        }else
-            Log.d("WeatherFragment", "WeatherDay is null");
+        }
+
         return view;
     }
 
